@@ -274,7 +274,7 @@
 
 	#intro-wrapper
 	{
-		padding-bottom: 8em;
+		padding: 2em;
 	}
 
 /*********************************************************************************/
@@ -284,12 +284,12 @@
 	#header
 	{
 		position: relative;
-		padding: 12em 0;
+		padding: 9em 0 1em 0;
 	}
 
 		.homepage #header
 		{
-			padding: 18em 0;
+/*			padding: 18em 0;*/
 		}
 
 /*********************************************************************************/
@@ -298,7 +298,7 @@
 
 	#logo
 	{
-		position: absolute;
+/*		position: absolute;*/
 		height: 5em;
 		top: 50%;
 		left: 0;
