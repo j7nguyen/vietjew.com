@@ -60,7 +60,7 @@ var titleString = function(showObject, title) {
   var middle;
   var link = setAttribute(showObject, "link");
   if (!!showObject.link) {
-    middle = "<a href='" + showObject.link + "'>" + title + "</a>";
+    middle = "<a href='" + showObject.link + "' target='_blank'>" + title + "</a>";
   } else {
     middle = title;
   }
