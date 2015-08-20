@@ -35,16 +35,16 @@ var toRow = function(item) {
   // var dateString = showDate.toDateString();
   var dateString = showDate.toLocaleString('en-US', timeOptions);
   var title = item.summary;
-  // var showObject = toShowObject(item.description);
+  var showObject = toShowObject(item);
   // var venue = setAttribute(showObject, "venue");
   // var price = setAttribute(showObject, "price");
-  // var link = setAttribute(showObject, "link");
   var locString = item.location.replace(", United States", "");
   var mapLink = mapURL + item.location;
   var newRow = $("<tr>");
   newRow.append("<td>" + dateString + "</td>");
-  newRow.append("<td>" + title + "</td>");
-  newRow.append("<td><a href='" + mapLink + "' target='_blank'>" + locString + "</a></td>");
+  newRow.append(titleString(showObject, title));
+  newRow.append("<td><a href='" + mapLink + "' target='_blank'>"
+    + locString + "</a></td>");
   return newRow;
 }
 
@@ -56,7 +56,19 @@ var setAttribute = function(showObject, attr) {
   }
 }
 
-var toShowObject = function(description) {
+var titleString = function(showObject, title) {
+  var middle;
+  var link = setAttribute(showObject, "link");
+  if (!!showObject.link) {
+    middle = "<a href='" + showObject.link + "'>" + title + "</a>";
+  } else {
+    middle = title;
+  }
+  return "<td>" + middle + "</td>"
+}
+
+var toShowObject = function(item) {
+  var description = !!item.description ? item.description : "";
   var chunks = description.split("\n");
   var show = {};
   chunks.forEach(function(chunk){
