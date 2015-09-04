@@ -20,32 +20,86 @@ var addShows = function(items) {
   for (i = 0; i < items.length; i++) {
     var item = items[i];
     var itemTime = new Date(item.start.dateTime);
-    if (cutoff > itemTime) {continue; }
-    var row = toRow(item);
-
-    $("#shows").append(row);
+    item['startTime'] = itemTime;
   }
-  items.forEach(function(item){
-
-  });
+  var sorted = items.sort(function(a,b) {
+    return a['startTime'] - b['startTime'];
+  })
+  for (i = 0; i < sorted.length; i++) {
+    var item = sorted[i];
+    if (cutoff > item['startTime']) {continue; }
+    var row = toRow(item);
+    $("#shows").append(row);
+  };
 }
 
 var toRow = function(item) {
   var showDate = new Date(item.start.dateTime);
-  // var dateString = showDate.toDateString();
   var dateString = showDate.toLocaleString('en-US', timeOptions);
   var title = item.summary;
   var showObject = toShowObject(item);
-  // var venue = setAttribute(showObject, "venue");
-  // var price = setAttribute(showObject, "price");
-  var locString = item.location.replace(", United States", "");
-  var mapLink = mapURL + item.location;
+
+
+
   var newRow = $("<tr>");
   newRow.append("<td>" + dateString + "</td>");
   newRow.append(titleString(showObject, title));
-  newRow.append("<td><a href='" + mapLink + "' target='_blank'>"
-    + locString + "</a></td>");
+  newRow.append(whereString(item, showObject))
   return newRow;
+}
+
+var whereString = function(item, showObject) {
+  var venue = setAttribute(showObject, "venue");
+  var venueLink = setAttribute(showObject, "venue_link");
+
+  var mapString = mapLink(item, venue);
+  var venueURL = venuePageString(venueLink);
+
+  var city = setAttribute(showObject, "city");
+  city = (city == "TBD" ? "" : ", " + city);
+  var state = setAttribute(showObject, "state");
+  state = (state = "TBD" ? "" : ", " + state);
+
+  if (venue == "TBD") {
+    return "<td>" + mapString + "</td>"
+  } else {
+    return "<td>" + venue + city + state + " (" + venueURL + mapString + ")</td>"
+  }
+}
+
+var mapLink = function(item, venue) {
+  var mapLink = mapURL + item.location;
+  var locString = item.location.replace(", United States", "");
+  if (venue == "TBD") {
+    return "<a href='" + mapLink + "' target='_blank'>" + locString + "</a>"
+  } else {
+    return "<a href='" + mapLink + "' target='_blank'>map</a>"
+  }
+}
+
+var venuePageString = function(venueLink) {
+  if (venueLink == "TBD") {
+    return "";
+  } else {
+    return "<a href='" + venueLink + "' target='_blank'>site</a>, ";
+  }
+}
+
+var toShowObject = function(item) {
+  var description = !!item.description ? item.description : "";
+  var chunks = description.split("\n");
+  var show = {};
+  chunks.forEach(function(chunk){
+    var separate = chunk.search(":");
+    var key = chunk.slice(0, separate);
+    var object = chunk.slice(separate+2);
+    show[key] = object;
+  });
+  return show;
+}
+
+var locationString = function(showObject) {
+
 }
 
 var setAttribute = function(showObject, attr) {
@@ -67,18 +121,7 @@ var titleString = function(showObject, title) {
   return "<td>" + middle + "</td>"
 }
 
-var toShowObject = function(item) {
-  var description = !!item.description ? item.description : "";
-  var chunks = description.split("\n");
-  var show = {};
-  chunks.forEach(function(chunk){
-    var separate = chunk.search(":");
-    var key = chunk.slice(0, separate);
-    var object = chunk.slice(separate+2);
-    show[key] = object;
-  });
-  return show;
-}
+
 
 $(document).ready(function() {
   getCalendar();
