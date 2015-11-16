@@ -1,4 +1,5 @@
-var calURL = "https://www.googleapis.com/calendar/v3/calendars/2o02frdlq63bi8rjipiuijq1l4%40group.calendar.google.com/events?&key=AIzaSyAHODXhRYNXD_rXz3ZclKNNrWLQzMkgfcw";
+var calURL = "https://www.googleapis.com/calendar/v3/calendars/2o02frdlq63bi8rjipiuijq1l4%40group.calendar.google.com/events?&key=AIzaSyAHODXhRYNXD_rXz3ZclKNNrWLQzMkgfcw&maxResults=250";
+// https://clients6.google.com/calendar/v3/calendars/attractivecamp@gmail.com/events?calendarId=attractivecamp%40gmail.com&singleEvents=true&timeZone=America%2FLos_Angeles&maxAttendees=1&maxResults=250&sanitizeHtml=true&timeMin=2016-01-15T00%3A00%3A00-07%3A00&timeMax=2016-02-15T00%3A00%3A00-07%3A00&key=AIzaSyBNlYH01_9Hc5S1J9vuFmu2nUqBZJNAXxs
 var mapURL = "https://maps.google.com/maps?hl=en&q=";
 var timeOptions = {
   weekday: "short", month: "long", day: "numeric", year: "numeric",
@@ -16,31 +17,54 @@ var getCalendar = function() {
 }
 
 var addShows = function(items) {
-  var cutoff = new Date() - 7200000;
-  for (i = 0; i < items.length; i++) {
-    var item = items[i];
-    var itemTime = new Date(item.start.dateTime);
-    item['startTime'] = itemTime;
-  }
-  var sorted = items.sort(function(a,b) {
+
+  var sorted = sortEvents(items);
+  sorted.forEach(function(item){console.log(item['startTime']);})
+  addRows(sorted);
+}
+
+var sortEvents = function(events) {
+  var current = [];
+  var cutoff = Date.now() - 7200000;
+  for (i = 0; i < events.length; i++) {
+    var item = events[i];
+    item['startTime'] = getTime(item);
+    if (cutoff < Date.parse(item['startTime'])) {
+      current.push(item);
+    }
+  };
+  sorted = current.sort(function(a,b) {
     return a['startTime'] - b['startTime'];
-  })
+  });
+
+  return sorted;
+}
+
+var addRows = function(sorted) {
   for (i = 0; i < sorted.length; i++) {
     var item = sorted[i];
-    if (cutoff > item['startTime']) {continue; }
     var row = toRow(item);
     $("#shows").append(row);
   };
 }
 
+var getTime = function(item) {
+  var offsets = {"America/New_York": 3, "America/Chicago": 2, "America/Denver": 1}
+  var startTime = new Date(item.start.dateTime);
+  var tz = item.start.timeZone;
+  if (offsets[tz]) {
+    startMS = Date.parse(startTime);
+    startTime = new Date(startMS + (3600000 * offsets[tz]));
+  }
+  return startTime;
+}
+
 var toRow = function(item) {
-  var showDate = new Date(item.start.dateTime);
+  var showDate = item['startTime'];
+  // var showDate = new Date(item.start.dateTime);
   var dateString = showDate.toLocaleString('en-US', timeOptions);
   var title = item.summary;
   var showObject = toShowObject(item);
-
-
-
   var newRow = $("<tr>");
   newRow.append("<td>" + dateString + "</td>");
   newRow.append(titleString(showObject, title));
@@ -68,12 +92,12 @@ var whereString = function(item, showObject) {
 }
 
 var mapLink = function(item, venue) {
-  var mapLink = mapURL + item.location;
+  var mLink = mapURL + item.location.replace("'", "&apos;");
   var locString = item.location.replace(", United States", "");
   if (venue == "TBD") {
-    return "<a href='" + mapLink + "' target='_blank'>" + locString + "</a>"
+    return "<a href='" + mLink + "' target='_blank'>" + locString + "</a>"
   } else {
-    return "<a href='" + mapLink + "' target='_blank'>map</a>"
+    return "<a href='" + mLink + "' target='_blank'>map</a>"
   }
 }
 

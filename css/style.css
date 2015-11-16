@@ -31,8 +31,29 @@
 
 .calendar h2 {
 	text-align: center;
-	font-size: 30px;
+	font-size: 20px;
 	margin: 20px;
+}
+
+.calendar {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.calendar td {
+
+}
+
+.date {
+	width: 30%;
+}
+
+.show-title {
+	width: 40%;
+}
+
+.where {
+	width: 30%;
 }
 
 /*********************************************************************************/
