@@ -1,5 +1,4 @@
 var calURL = "https://www.googleapis.com/calendar/v3/calendars/2o02frdlq63bi8rjipiuijq1l4%40group.calendar.google.com/events?&key=AIzaSyAHODXhRYNXD_rXz3ZclKNNrWLQzMkgfcw&maxResults=250";
-// https://clients6.google.com/calendar/v3/calendars/attractivecamp@gmail.com/events?calendarId=attractivecamp%40gmail.com&singleEvents=true&timeZone=America%2FLos_Angeles&maxAttendees=1&maxResults=250&sanitizeHtml=true&timeMin=2016-01-15T00%3A00%3A00-07%3A00&timeMax=2016-02-15T00%3A00%3A00-07%3A00&key=AIzaSyBNlYH01_9Hc5S1J9vuFmu2nUqBZJNAXxs
 var mapURL = "https://maps.google.com/maps?hl=en&q=";
 var timeOptions = {
   weekday: "short", month: "long", day: "numeric", year: "numeric",
@@ -17,9 +16,7 @@ var getCalendar = function() {
 }
 
 var addShows = function(items) {
-
   var sorted = sortEvents(items);
-  sorted.forEach(function(item){console.log(item['startTime']);})
   addRows(sorted);
 }
 
@@ -49,19 +46,18 @@ var addRows = function(sorted) {
 }
 
 var getTime = function(item) {
-  var offsets = {"America/New_York": 3, "America/Chicago": 2, "America/Denver": 1}
+  // var offsets = {"America/New_York": 3, "America/Chicago": 2, "America/Denver": 1}
   var startTime = new Date(item.start.dateTime);
-  var tz = item.start.timeZone;
-  if (offsets[tz]) {
-    startMS = Date.parse(startTime);
-    startTime = new Date(startMS + (3600000 * offsets[tz]));
-  }
+  // var tz = item.start.timeZone;
+  // if (offsets[tz]) {
+  //   startMS = Date.parse(startTime);
+  //   startTime = new Date(startMS + (3600000 * offsets[tz]));
+  // }
   return startTime;
 }
 
 var toRow = function(item) {
   var showDate = item['startTime'];
-  // var showDate = new Date(item.start.dateTime);
   var dateString = showDate.toLocaleString('en-US', timeOptions);
   var title = item.summary;
   var showObject = toShowObject(item);
@@ -144,8 +140,6 @@ var titleString = function(showObject, title) {
   }
   return "<td>" + middle + "</td>"
 }
-
-
 
 $(document).ready(function() {
   getCalendar();
